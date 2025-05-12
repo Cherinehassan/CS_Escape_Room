@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "title": "Password Strength Analysis",
+    "description": "As a cybersecurity professional, you need to evaluate password strength. Analyze the given passwords and identify which one provides the best security.",
+    "short_description": "Evaluate password security based on modern standards",
+    "difficulty": "Easy",
+    "category": "Authentication",
+    "points": 100,
+    "content": "You need to evaluate which of these passwords is the strongest according to modern password security standards:\n\n1. password123\n2. P@ssw0rd!\n3. LongButSimplePasswordPhrase\n\nEnter the number of the strongest password (1, 2, or 3).",
+    "solution": "3",
+    "hint": "Consider both complexity (special characters, mixed case) and length. Longer passwords generally provide more entropy than shorter ones with special characters."
+  },
+  {
+    "id": 2,
+    "title": "Caesar Cipher Decryption",
+    "description": "Caesar ciphers are classic encryption techniques. You've intercepted an encrypted message that was encrypted using a Caesar cipher with a key of 3.",
+    "short_description": "Decrypt a message encrypted with a Caesar cipher",
+    "difficulty": "Easy",
+    "category": "Cryptography",
+    "points": 100,
+    "content": "Decrypt this message which was encoded using a Caesar cipher with key=3:\n\n'Fdhvdu flskhu lv edvlf'\n\nRemember: In a Caesar cipher with key=3, each letter is shifted 3 positions earlier in the alphabet. For example, 'D' becomes 'A', 'E' becomes 'B', etc.",
+    "solution": "Caesar cipher is basic",
+    "hint": "Shift each letter backwards by 3 positions in the alphabet. For example, 'F' → 'C', 'D' → 'A', etc."
+  },
+  {
+    "id": 3,
+    "title": "Phishing Detection",
+    "description": "Phishing remains one of the most common attack vectors. Your task is to analyze a suspicious email and identify the signs that indicate it's a phishing attempt.",
+    "short_description": "Identify indicators of a phishing email",
+    "difficulty": "Medium",
+    "category": "Social Engineering",
+    "points": 150,
+    "content": "You've received the following email:\n\n---\nFrom: security@amaz0n-security.net\nSubject: Urgent: Suspicious activity detected\n\nDear valued customer,\n\nWe've detected suspicious activity on your account. Your account will be suspended within 24 hours unless you verify your identity by clicking here: www.amaz0n-security.net/verify\n\nAmazon Security Team\n---\n\nWhat is the MAIN indicator that this is a phishing email? Enter one of: fake domain, urgency tactics, grammar errors, sender address",
+    "solution": "fake domain",
+    "hint": "Check the URL and sender address carefully. Legitimate companies use their official domains."
+  },
+  {
+    "id": 4,
+    "title": "SQL Injection Analysis",
+    "description": "SQL injection is a common vulnerability in web applications. Your task is to analyze a potential SQL injection attempt and determine its impact.",
+    "short_description": "Analyze the effect of a SQL injection attack",
+    "difficulty": "Medium",
+    "category": "Web Security",
+    "points": 150,
+    "content": "In a web application with the following login query:\n\nSELECT * FROM users WHERE username = '[INPUT1]' AND password = '[INPUT2]'\n\nA user submits this input for the username field:\nadmin' --\n\nWhat would be the effect of this input on a vulnerable system? Enter your answer as a brief phrase.",
+    "solution": "bypass password check",
+    "hint": "The -- characters are used for comments in SQL. What happens to the rest of the query after a comment?"
+  },
+  {
+    "id": 5,
+    "title": "Hash Verification Challenge",
+    "description": "File integrity is crucial in cybersecurity. Your task is to use hash verification to determine which file has been tampered with.",
+    "short_description": "Identify a modified file using hash verification",
+    "difficulty": "Medium",
+    "category": "Cryptography",
+    "points": 150,
+    "content": "You have three files with the following SHA-256 hashes:\n\nOriginal file: a8d4b32c98b7e3f96576da286da72964\nFile 1: a8d4b32c98b7e3f96576da286da72964\nFile 2: a8d4b32c98b7e3f96576da286da72965\n\nWhich file has been modified? Enter '1' or '2'.",
+    "solution": "2",
+    "hint": "Compare each hash with the original. Even a tiny change in the file will produce a completely different hash value."
+  },
+  {
+    "id": 6,
+    "title": "Network Traffic Analysis",
+    "description": "As a security analyst, you've been asked to analyze suspicious network traffic to identify a potential data exfiltration attempt.",
+    "short_description": "Analyze network traffic for data exfiltration",
+    "difficulty": "Hard",
+    "category": "Network Security",
+    "points": 200,
+    "content": "You've captured the following DNS requests from a suspicious host:\n\n08:15:22 - company-data.secret.to.malicious.com\n08:15:25 - financial-reports.secret.to.malicious.com\n08:15:28 - passwords.secret.to.malicious.com\n\nWhat technique is likely being used for data exfiltration? Enter: DNS tunneling, HTTP covert channel, ICMP tunneling, or FTP hidden transfer",
+    "solution": "DNS tunneling",
+    "hint": "Look at the domain format and how information might be encoded in the subdomain names."
+  },
+  {
+    "id": 7,
+    "title": "XSS Vulnerability Assessment",
+    "description": "Cross-Site Scripting (XSS) remains a common web vulnerability. Your task is to identify potential XSS vulnerabilities in a web application.",
+    "short_description": "Identify and analyze XSS vulnerabilities",
+    "difficulty": "Hard",
+    "category": "Web Security",
+    "points": 200,
+    "content": "A web application takes user input through a search field and displays it on the results page with this code:\n\n```html\n<div>You searched for: [user_input]</div>\n```\n\nWhat input would you use to test for XSS vulnerability? Provide a simple proof-of-concept payload.",
+    "solution": "<script>alert(1)</script>",
+    "hint": "Think about how you could inject JavaScript code that would execute when the page renders."
+  },
+  {
+    "id": 8,
+    "title": "Secure Coding Challenge",
+    "description": "Identifying and fixing security vulnerabilities in code is a critical skill. Analyze the given code and identify the security vulnerability.",
+    "short_description": "Find security vulnerabilities in code",
+    "difficulty": "Hard",
+    "category": "Secure Coding",
+    "points": 200,
+    "content": "Analyze this Python code snippet and identify the security vulnerability:\n\n```python\ndef process_file(filename):\n    # Process the user-provided filename\n    os.system('convert ' + filename + ' output.png')\n```\n\nWhat type of vulnerability is present? Enter: command injection, path traversal, buffer overflow, or race condition",
+    "solution": "command injection",
+    "hint": "Think about what happens if a user provides special characters that have meaning in shell commands."
+  }
+]

@@ -1,0 +1,211 @@
+{
+  "puzzles": [
+    {
+      "id": 1,
+      "name": "Caesar Cipher Decryption",
+      "description": "Decrypt the message: 'Fdhvdu flskhu lv d vlpsoh vxevwlwxwlrq flskhu.'",
+      "learning_objective": "Understand how Caesar Cipher works.",
+      "difficulty": "Easy",
+      "category": "Cryptography",
+      "hints": [
+        "The Caesar Cipher uses a shift.",
+        "Try shifting letters backward by 3.",
+        "It starts with 'Caesar cipher...'"
+      ],
+      "answer": "Caesar cipher is a simple substitution cipher"
+    },
+    {
+      "id": 2,
+      "name": "Phishing Email Detection",
+      "description": "You receive an email asking to reset your bank password with a strange link. What type of attack is this?",
+      "learning_objective": "Identify phishing and social engineering attacks.",
+      "difficulty": "Easy",
+      "category": "Social Engineering",
+      "hints": [
+        "Is the attacker tricking the user into giving credentials?",
+        "Does the email pretend to be someone else?"
+      ],
+      "answer": "Phishing"
+    },
+    {
+      "id": 3,
+      "name": "Hash Integrity Check",
+      "description": "Why are hash functions used in verifying file downloads?",
+      "learning_objective": "Understand how hashing protects data integrity.",
+      "difficulty": "Medium",
+      "category": "Hashing",
+      "hints": [
+        "Do hashes change if the file changes?",
+        "What does a matching hash indicate?"
+      ],
+      "answer": "To ensure the file was not tampered with"
+    },
+    {
+      "id": 4,
+      "name": "Malware Types",
+      "description": "A program locks all your files and asks for payment. What type of malware is this?",
+      "learning_objective": "Identify common types of malware.",
+      "difficulty": "Medium",
+      "category": "Malware",
+      "hints": [
+        "It's not a virus or worm.",
+        "It demands a ransom.",
+        "It's common in cyber extortion."
+      ],
+      "answer": "Ransomware"
+    },
+    {
+      "id": 5,
+      "name": "RSA Key Understanding",
+      "description": "In RSA, which key is used for encryption and which for decryption?",
+      "learning_objective": "Understand public/private key roles in RSA.",
+      "difficulty": "Hard",
+      "category": "Cryptography",
+      "hints": [
+        "Encryption is done with the public key.",
+        "Decryption is done with the private key."
+      ],
+      "answer": "Public key encrypts, private key decrypts"
+    },
+    {
+      "id": 6,
+      "name": "SQL Injection",
+      "description": "What is the vulnerability when a website executes SQL commands from user input without proper sanitization?",
+      "learning_objective": "Understand SQL injection attacks and prevention.",
+      "difficulty": "Medium",
+      "category": "Attacks",
+      "hints": [
+        "It involves database queries.",
+        "User input is executed as code.",
+        "It often uses special characters like ' or \"."
+      ],
+      "answer": "SQL Injection"
+    },
+    {
+      "id": 7,
+      "name": "Password Strength",
+      "description": "Which password is stronger? 'Password123' or 'x7!K9@zP'?",
+      "learning_objective": "Understand password complexity and strength.",
+      "difficulty": "Easy",
+      "category": "Authentication",
+      "hints": [
+        "Consider character variety.",
+        "Dictionary words are weaker.",
+        "Look at special characters and length."
+      ],
+      "answer": "x7!K9@zP"
+    },
+    {
+      "id": 8,
+      "name": "HTTPS Understanding",
+      "description": "What encryption protocol is used in HTTPS to secure web communications?",
+      "learning_objective": "Understand secure web protocols.",
+      "difficulty": "Medium",
+      "category": "Encryption",
+      "hints": [
+        "It's the successor to SSL.",
+        "It stands for Transport Layer Security.",
+        "It's abbreviated as TLS."
+      ],
+      "answer": "TLS"
+    },
+    {
+      "id": 9,
+      "name": "Buffer Overflow",
+      "description": "What vulnerability occurs when a program writes data beyond the allocated memory buffer?",
+      "learning_objective": "Understand memory-based vulnerabilities.",
+      "difficulty": "Hard",
+      "category": "Attacks",
+      "hints": [
+        "It's about memory management.",
+        "It happens when input exceeds expected size.",
+        "It can allow arbitrary code execution."
+      ],
+      "answer": "Buffer Overflow"
+    },
+    {
+      "id": 10,
+      "name": "AES Key Length",
+      "description": "What are the standard key lengths (in bits) supported by the AES encryption algorithm?",
+      "learning_objective": "Understand AES encryption standards.",
+      "difficulty": "Hard",
+      "category": "Encryption",
+      "hints": [
+        "There are three standard lengths.",
+        "They are 128, 192, and 256 bits.",
+        "Longer keys provide more security."
+      ],
+      "answer": "128, 192, 256"
+    },
+    {
+      "id": 11,
+      "name": "Man-in-the-Middle",
+      "description": "What attack involves an attacker secretly relaying and possibly altering communication between two parties?",
+      "learning_objective": "Understand network interception attacks.",
+      "difficulty": "Medium",
+      "category": "Attacks",
+      "hints": [
+        "The attacker positions between the victim and legitimate service.",
+        "It's often abbreviated as MITM.",
+        "It can be used to steal credentials or data."
+      ],
+      "answer": "Man-in-the-Middle"
+    },
+    {
+      "id": 12,
+      "name": "Steganography",
+      "description": "What technique involves hiding messages within ordinary, non-secret data or files?",
+      "learning_objective": "Understand data hiding techniques.",
+      "difficulty": "Medium",
+      "category": "Cryptography",
+      "hints": [
+        "It's different from encryption.",
+        "It can hide data in images or audio.",
+        "The hidden message isn't obvious to observers."
+      ],
+      "answer": "Steganography"
+    },
+    {
+      "id": 13,
+      "name": "Two-Factor Authentication",
+      "description": "What security approach requires two different types of authentication factors?",
+      "learning_objective": "Understand multi-factor authentication concepts.",
+      "difficulty": "Easy",
+      "category": "Authentication",
+      "hints": [
+        "It combines what you know with what you have.",
+        "It's often abbreviated as 2FA.",
+        "Examples include password + SMS code."
+      ],
+      "answer": "Two-Factor Authentication"
+    },
+    {
+      "id": 14,
+      "name": "SHA Algorithms",
+      "description": "What does SHA stand for in cryptographic hash functions like SHA-256?",
+      "learning_objective": "Understand common hash algorithm terminology.",
+      "difficulty": "Medium",
+      "category": "Hashing",
+      "hints": [
+        "It's developed by the NSA.",
+        "It relates to how the algorithm works.",
+        "It stands for Secure Hash Algorithm."
+      ],
+      "answer": "Secure Hash Algorithm"
+    },
+    {
+      "id": 15,
+      "name": "Social Engineering Types",
+      "description": "What social engineering technique involves creating a scenario to exploit human emotions like fear or urgency?",
+      "learning_objective": "Identify social engineering tactics.",
+      "difficulty": "Easy",
+      "category": "Social Engineering",
+      "hints": [
+        "It's similar to creating a fake emergency.",
+        "It often claims immediate action is required.",
+        "It creates a sense of urgency or danger."
+      ],
+      "answer": "Pretexting"
+    }
+  ]
+} 

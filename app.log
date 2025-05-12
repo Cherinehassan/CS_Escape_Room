@@ -1,0 +1,29 @@
+2025-05-12 18:11:22,949 - src.database.db_manager - INFO - Database initialized at data/cybersecurity_escape_room.db
+2025-05-12 18:11:22,955 - src.database.db_manager - INFO - Database tables created successfully
+2025-05-12 18:11:22,963 - src.database.db_manager - INFO - Creating default puzzle categories
+2025-05-12 18:11:22,965 - src.database.db_manager - INFO - Creating default achievements
+2025-05-12 18:11:22,966 - src.database.db_manager - INFO - Default data created successfully
+2025-05-12 18:12:15,763 - src.gui.auth_screens - WARNING - Registration failed: Terms not accepted
+2025-05-12 18:12:29,816 - src.core.auth - INFO - New user registered: cherine12
+2025-05-12 18:12:44,980 - src.core.auth - INFO - User logged in: cherine12
+2025-05-12 18:12:44,981 - src.gui.app - INFO - User logged in successfully: cherine12
+2025-05-12 18:12:54,876 - src.gui.tutorial_screen - ERROR - Error marking tutorial as completed: 'DatabaseManager' object has no attribute 'UserProfile'
+2025-05-12 18:12:56,048 - src.gui.challenge_screen - ERROR - Error loading categories: 'DatabaseManager' object has no attribute 'PuzzleCategory'
+2025-05-12 18:13:31,350 - src.gui.challenge_screen - ERROR - Error loading categories: 'DatabaseManager' object has no attribute 'PuzzleCategory'
+2025-05-12 18:14:48,570 - src.database.db_manager - INFO - Database initialized at data/cybersecurity_escape_room.db
+2025-05-12 18:14:48,573 - src.database.db_manager - INFO - Database tables created successfully
+2025-05-12 18:14:48,582 - src.database.db_manager - INFO - Default data created successfully
+2025-05-12 18:15:25,987 - src.core.auth - INFO - User logged in: cherine12
+2025-05-12 18:15:25,988 - src.gui.app - INFO - User logged in successfully: cherine12
+2025-05-12 18:18:58,063 - src.database.db_manager - INFO - Database initialized at data/cybersecurity_escape_room.db
+2025-05-12 18:18:58,067 - src.database.db_manager - INFO - Database tables created successfully
+2025-05-12 18:18:58,076 - src.database.db_manager - INFO - Default data created successfully
+2025-05-12 18:19:15,166 - src.core.auth - INFO - User logged in: cherine12
+2025-05-12 18:19:15,167 - src.gui.app - INFO - User logged in successfully: cherine12
+2025-05-12 18:34:31,290 - src.database.db_manager - INFO - Database initialized at data/cybersecurity_escape_room.db
+2025-05-12 18:34:31,294 - src.database.db_manager - INFO - Database tables created successfully
+2025-05-12 18:34:31,302 - src.database.db_manager - INFO - Default data created successfully
+2025-05-12 18:34:31,303 - src.core.puzzle_manager - INFO - Loaded 15 puzzles from puzzles.json
+2025-05-12 18:34:31,303 - src.core.puzzle_manager - INFO - Found categories: Social Engineering, Authentication, Malware, Cryptography, Hashing, Encryption, Attacks
+2025-05-12 18:34:44,480 - src.core.auth - INFO - User logged in: cherine12
+2025-05-12 18:34:44,480 - src.gui.app - INFO - User logged in successfully: cherine12
