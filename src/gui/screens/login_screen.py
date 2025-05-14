@@ -239,6 +239,11 @@ class LoginScreen(QWidget):
         # In a real application, verify credentials against database
         # For this example, we'll just emit the login successful signal
         # You would replace this with actual authentication logic
+        
+        # Clear any current input
+        self.clear_inputs()
+        
+        # Emit signal with username
         self.login_successful.emit(username)
     
     def set_error_message(self, message):

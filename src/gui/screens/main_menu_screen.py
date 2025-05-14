@@ -24,6 +24,7 @@ class MainMenuScreen(QWidget):
     view_puzzles_requested = pyqtSignal()  # View available puzzles
     view_dashboard_requested = pyqtSignal()  # View progress dashboard
     view_analytics_requested = pyqtSignal()  # View analytics screen
+    view_leaderboard_requested = pyqtSignal()  # View leaderboard
     view_settings_requested = pyqtSignal()  # View settings
     view_tutorial_requested = pyqtSignal()  # View tutorial
     logout_requested = pyqtSignal()  # Log out of the game
@@ -117,15 +118,20 @@ class MainMenuScreen(QWidget):
         self.analytics_button.setObjectName("mainMenuButton")
         button_layout.addWidget(self.analytics_button, 2, 0)
         
+        # Leaderboard button
+        self.leaderboard_button = QPushButton("GLOBAL LEADERBOARD")
+        self.leaderboard_button.setObjectName("mainMenuButton")
+        button_layout.addWidget(self.leaderboard_button, 2, 1)
+        
         # Settings button
         self.settings_button = QPushButton("SETTINGS")
         self.settings_button.setObjectName("mainMenuButton")
-        button_layout.addWidget(self.settings_button, 2, 1)
+        button_layout.addWidget(self.settings_button, 3, 0)
         
         # Tutorial button
         self.tutorial_button = QPushButton("TUTORIAL")
         self.tutorial_button.setObjectName("mainMenuButton")
-        button_layout.addWidget(self.tutorial_button, 3, 0)
+        button_layout.addWidget(self.tutorial_button, 3, 1)
         
         # Logout button
         self.logout_button = QPushButton("LOGOUT")
@@ -162,6 +168,7 @@ class MainMenuScreen(QWidget):
         self.puzzles_button.clicked.connect(self.view_puzzles_requested.emit)
         self.dashboard_button.clicked.connect(self.view_dashboard_requested.emit)
         self.analytics_button.clicked.connect(self.view_analytics_requested.emit)
+        self.leaderboard_button.clicked.connect(self.view_leaderboard_requested.emit)
         self.settings_button.clicked.connect(self.view_settings_requested.emit)
         self.tutorial_button.clicked.connect(self.view_tutorial_requested.emit)
         self.logout_button.clicked.connect(self.logout_requested.emit)

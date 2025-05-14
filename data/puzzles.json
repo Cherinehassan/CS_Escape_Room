@@ -7,7 +7,7 @@
     "difficulty": "Easy",
     "category": "Authentication",
     "points": 100,
-    "content": "You need to evaluate which of these passwords is the strongest according to modern password security standards:\n\n1. password123\n2. P@ssw0rd!\n3. LongButSimplePasswordPhrase\n\nEnter the number of the strongest password (1, 2, or 3).",
+    "content": "You need to evaluate which of these passwords is the strongest according to modern password security standards:\n\n1. password123\n2. P@ssw0rd!\n3. LongButSimplePasswordPhrase\n\nEnter the number of the strongest password (1, 2, or 3).\n\nNote: While option 2 has special characters and mixed case, modern security standards prioritize length over complexity. A longer passphrase (option 3) has significantly more entropy than a shorter password with special characters and common substitutions.",
     "solution": "3",
     "hint": "Consider both complexity (special characters, mixed case) and length. Longer passwords generally provide more entropy than shorter ones with special characters."
   },
@@ -94,5 +94,89 @@
     "content": "Analyze this Python code snippet and identify the security vulnerability:\n\n```python\ndef process_file(filename):\n    # Process the user-provided filename\n    os.system('convert ' + filename + ' output.png')\n```\n\nWhat type of vulnerability is present? Enter: command injection, path traversal, buffer overflow, or race condition",
     "solution": "command injection",
     "hint": "Think about what happens if a user provides special characters that have meaning in shell commands."
+  },
+  {
+    "id": 9,
+    "title": "Multi-Factor Authentication",
+    "description": "You need to implement the most secure authentication method for a financial application. Evaluate different MFA options.",
+    "short_description": "Choose the best MFA implementation",
+    "difficulty": "Medium",
+    "category": "Authentication",
+    "points": 150,
+    "content": "Which of these multi-factor authentication methods provides the highest security for a banking application?\n\n1. Password + SMS code\n2. Password + Email link\n3. Password + Hardware token (like YubiKey)\n4. Password + Knowledge-based questions\n\nEnter the number of the most secure option.",
+    "solution": "3",
+    "hint": "Consider which factors can be intercepted or compromised through common attack vectors like SIM swapping or phishing."
+  },
+  {
+    "id": 10,
+    "title": "Encryption Key Management",
+    "description": "Proper key management is crucial for maintaining the security of encrypted data. Identify the best practice for encryption key storage.",
+    "short_description": "Identify best practices for key management",
+    "difficulty": "Hard",
+    "category": "Encryption",
+    "points": 200,
+    "content": "Which of these is the BEST practice for storing encryption keys in an enterprise environment?\n\n1. In the same database as the encrypted data\n2. In environment variables on the application server\n3. In a dedicated Hardware Security Module (HSM)\n4. In a configuration file with restricted permissions\n\nEnter the number of the best option.",
+    "solution": "3",
+    "hint": "Consider physical security, access controls, and separation of keys from the data they protect."
+  },
+  {
+    "id": 11,
+    "title": "Wireless Security Protocol",
+    "description": "You need to recommend the most secure Wi-Fi security protocol for a corporate network. Compare different protocols to make the best choice.",
+    "short_description": "Select the most secure Wi-Fi protocol",
+    "difficulty": "Medium",
+    "category": "Network Security",
+    "points": 150,
+    "content": "Which of these Wi-Fi security protocols provides the strongest security for a new corporate network deployment?\n\n1. WEP\n2. WPA\n3. WPA2\n4. WPA3\n\nEnter the number of the most secure protocol.",
+    "solution": "4",
+    "hint": "Consider which protocol is the newest and addresses vulnerabilities found in previous versions."
+  },
+  {
+    "id": 12,
+    "title": "OWASP Top 10 Analysis",
+    "description": "The OWASP Top 10 lists the most critical web application security risks. Identify which vulnerability is being exploited in a given scenario.",
+    "short_description": "Identify OWASP Top 10 vulnerabilities",
+    "difficulty": "Hard",
+    "category": "Web Security",
+    "points": 200,
+    "content": "A web application allows users to upload profile pictures without validating the file type or scanning for malicious content. An attacker uploads a .php file disguised as an image, which executes when accessed via the web server.\n\nWhich OWASP Top 10 vulnerability is primarily being exploited? Enter one of: Injection, Broken Authentication, Sensitive Data Exposure, XML External Entities, Broken Access Control, Security Misconfiguration, Cross-Site Scripting, Insecure Deserialization, Using Components with Known Vulnerabilities, Insufficient Logging & Monitoring",
+    "solution": "Security Misconfiguration",
+    "hint": "Think about server configuration issues that allow execution of uploaded files."
+  },
+  {
+    "id": 13,
+    "title": "Public Key Cryptography",
+    "description": "Understanding public key cryptography is essential for secure communications. Analyze how keys are used in different operations.",
+    "short_description": "Understand public/private key usage",
+    "difficulty": "Medium",
+    "category": "Cryptography",
+    "points": 150,
+    "content": "In public key cryptography, which key would you use to VERIFY a digital signature?\n\n1. The sender's private key\n2. The sender's public key\n3. The recipient's private key\n4. The recipient's public key\n\nEnter the number of the correct option.",
+    "solution": "2",
+    "hint": "Think about who creates the signature and who needs to verify it. The key used for verification must be widely available."
+  },
+  {
+    "id": 14,
+    "title": "Incident Response",
+    "description": "Proper incident response procedures are critical during a security breach. Identify the correct sequence of steps in the incident response process.",
+    "short_description": "Order incident response steps correctly",
+    "difficulty": "Hard",
+    "category": "Security Management",
+    "points": 200,
+    "content": "Put these incident response steps in the correct order:\n\nA. Recovery\nB. Identification\nC. Containment\nD. Eradication\nE. Preparation\nF. Lessons Learned\n\nEnter the correct sequence as a string of letters (e.g., 'ABCDEF').",
+    "solution": "EBCDAF",
+    "hint": "Think about logical progression - you need to prepare before an incident occurs, and learn lessons after recovery is complete."
+  },
+  {
+    "id": 15,
+    "title": "Secure Password Storage",
+    "description": "Storing passwords securely is critical for protecting user accounts. Evaluate different password storage methods to identify the most secure approach.",
+    "short_description": "Identify secure password storage methods",
+    "difficulty": "Medium",
+    "category": "Authentication",
+    "points": 150,
+    "content": "Which of these methods is the MOST secure for storing user passwords in a database?\n\n1. MD5 hash\n2. SHA-256 hash\n3. Bcrypt with salt\n4. AES-256 encryption with a system-wide key\n\nEnter the number of the most secure option.",
+    "solution": "3",
+    "hint": "Consider which method is specifically designed for password storage and includes protection against rainbow table attacks and brute force attempts."
   }
 ]

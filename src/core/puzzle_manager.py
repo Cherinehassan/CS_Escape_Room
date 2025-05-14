@@ -22,6 +22,7 @@ class Puzzle:
         """
         self.id = puzzle_data.get("id", 0)
         self.name = puzzle_data.get("name", "Unnamed Puzzle")
+        self.title = puzzle_data.get("title", self.name)
         self.description = puzzle_data.get("description", "")
         self.learning_objective = puzzle_data.get("learning_objective", "")
         self.category = puzzle_data.get("category", "General")
@@ -29,6 +30,13 @@ class Puzzle:
         self.hints = puzzle_data.get("hints", [])
         self.answer = puzzle_data.get("answer", "")
         self.alternate_answers = puzzle_data.get("alternate_answers", [])
+        self.content = puzzle_data.get("content", "")
+        self.points = puzzle_data.get("points", 100)
+        self.solution = puzzle_data.get("solution", self.answer)
+        self.hint = puzzle_data.get("hint", "")
+        
+        if self.hint and not self.hints:
+            self.hints = [self.hint]
     
     def check_answer(self, user_answer, partial_match=False):
         """
@@ -43,11 +51,18 @@ class Puzzle:
         """
         # Normalize answers for comparison
         normalized_user = user_answer.strip().lower()
-        normalized_correct = self.answer.strip().lower()
         
-        # Check main answer
-        if normalized_user == normalized_correct:
-            return True
+        # Check against both answer and solution fields
+        correct_answers = []
+        if self.answer:
+            correct_answers.append(self.answer.strip().lower())
+        if hasattr(self, 'solution') and self.solution and self.solution != self.answer:
+            correct_answers.append(self.solution.strip().lower())
+        
+        # Check main answers
+        for correct in correct_answers:
+            if normalized_user == correct:
+                return True
         
         # Check alternate answers
         for alt in self.alternate_answers:
@@ -55,14 +70,15 @@ class Puzzle:
                 return True
         
         # Check for partial match if allowed
-        if partial_match and normalized_correct and normalized_user:
-            # Check if user answer is part of the correct answer
-            if normalized_user in normalized_correct:
-                return True
-            
-            # Check if correct answer is part of the user answer
-            if normalized_correct in normalized_user:
-                return True
+        if partial_match and correct_answers and normalized_user:
+            for correct in correct_answers:
+                # Check if user answer is part of the correct answer
+                if normalized_user in correct:
+                    return True
+                
+                # Check if correct answer is part of the user answer
+                if correct in normalized_user:
+                    return True
             
             # Check alternate answers for partial matches
             for alt in self.alternate_answers:

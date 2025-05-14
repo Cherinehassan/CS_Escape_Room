@@ -207,79 +207,80 @@ class PuzzleScreen(QWidget):
     def _apply_styles(self):
         """Apply styles to the puzzle screen"""
         self.setStyleSheet("""
-            #puzzleTitle {
-                font-size: 28px;
-                font-weight: bold;
-                color: #00ccff;
-            }
-            
-            #timerLabel {
-                font-size: 20px;
-                color: #ff9900;
-                font-family: 'Courier New', monospace;
-                font-weight: bold;
-            }
-            
             #backButton {
-                background-color: rgba(0, 0, 0, 0.5);
-                color: #cccccc;
-                border: 1px solid #555555;
-                border-radius: 4px;
-                padding: 8px 16px;
+                background-color: transparent;
+                color: #ffffff;
+                border: 1px solid #ffffff;
+                border-radius: 5px;
+                padding: 5px 10px;
                 font-size: 14px;
             }
             
             #backButton:hover {
-                background-color: rgba(0, 0, 0, 0.7);
-                color: #ffffff;
-                border-color: #00ccff;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            #puzzleTitle {
+                color: #00ccff;
+                font-size: 24px;
+                font-weight: bold;
+            }
+            
+            #timerLabel {
+                color: #ff9900;
+                font-size: 24px;
+                font-family: monospace;
+                font-weight: bold;
             }
             
             #infoFrame {
-                background-color: rgba(0, 20, 40, 0.5);
+                background-color: rgba(0, 0, 0, 0.3);
                 border-radius: 5px;
                 padding: 10px;
                 border: 1px solid #333333;
             }
             
             #infoLabel {
-                color: #cccccc;
+                color: #ffffff;
                 font-size: 14px;
             }
             
             #contentFrame {
-                background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.2);
                 border-radius: 10px;
                 border: 1px solid #333333;
             }
             
             #descriptionLabel {
-                color: #ffffff;
+                color: #cccccc;
                 font-size: 16px;
-                line-height: 1.4;
+                margin-bottom: 10px;
             }
             
             #puzzleText {
-                background-color: rgba(0, 10, 20, 0.7);
-                color: #00ff99;
-                border: 1px solid #333333;
+                background-color: rgba(10, 20, 30, 0.7);
+                color: #ffffff;
+                border: 1px solid #444444;
                 border-radius: 5px;
-                padding: 10px;
-                font-family: 'Courier New', monospace;
-                font-size: 14px;
+                padding: 15px;
+                font-size: 16px;
+                line-height: 1.5;
+                font-family: 'Consolas', monospace;
+                selection-background-color: #00ccff;
+                selection-color: #000000;
             }
             
-            #solutionFrame, #progressFrame {
-                background-color: rgba(0, 20, 30, 0.4);
-                border-radius: 5px;
+            #solutionFrame {
+                background-color: rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
                 padding: 15px;
                 border: 1px solid #333333;
             }
             
             #sectionTitle {
+                color: #00ccff;
                 font-size: 16px;
                 font-weight: bold;
-                color: #00ccff;
                 margin-bottom: 10px;
             }
             
@@ -290,7 +291,6 @@ class PuzzleScreen(QWidget):
                 border-radius: 5px;
                 padding: 8px;
                 font-size: 14px;
-                font-family: 'Courier New', monospace;
             }
             
             #solutionInput:focus {
@@ -302,7 +302,7 @@ class PuzzleScreen(QWidget):
                 color: #000000;
                 border: none;
                 border-radius: 5px;
-                padding: 8px 20px;
+                padding: 8px 15px;
                 font-size: 14px;
                 font-weight: bold;
             }
@@ -317,7 +317,6 @@ class PuzzleScreen(QWidget):
             
             #hintLabel {
                 color: #cccccc;
-                font-style: italic;
                 font-size: 14px;
             }
             
@@ -332,6 +331,13 @@ class PuzzleScreen(QWidget):
             
             #hintButton:hover {
                 background-color: rgba(255, 153, 0, 0.2);
+            }
+            
+            #progressFrame {
+                background-color: rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
+                padding: 15px;
+                border: 1px solid #333333;
             }
             
             #puzzleProgress {
@@ -393,7 +399,12 @@ class PuzzleScreen(QWidget):
             self.difficulty_label.setText(f"Difficulty: {self.current_puzzle.get('difficulty', 'Medium')}")
             self.category_label.setText(f"Category: {self.current_puzzle.get('category', 'General')}")
             self.points_label.setText(f"Points: {self.current_puzzle.get('points', 100)}")
-            self.puzzle_text.setText(self.current_puzzle.get('content', 'No puzzle content available'))
+            
+            # Display content if available, otherwise use description
+            content = self.current_puzzle.get('content', '')
+            if not content:
+                content = self.current_puzzle.get('description', 'No puzzle content available')
+            self.puzzle_text.setText(content)
         else:
             # Handle Puzzle object format
             self.title_label.setText(getattr(self.current_puzzle, 'title', self.current_puzzle.name))
@@ -402,8 +413,10 @@ class PuzzleScreen(QWidget):
             self.category_label.setText(f"Category: {self.current_puzzle.category}")
             self.points_label.setText(f"Points: {getattr(self.current_puzzle, 'points', 100)}")
             
-            # Use content field if available, otherwise use description
-            content = getattr(self.current_puzzle, 'content', self.current_puzzle.description)
+            # Display content if available, otherwise use description
+            content = getattr(self.current_puzzle, 'content', '')
+            if not content:
+                content = self.current_puzzle.description
             self.puzzle_text.setText(content)
         
         # Start timer
@@ -461,10 +474,17 @@ class PuzzleScreen(QWidget):
         # Stop timer
         self.timer.stop()
         
+        # Get puzzle points
+        points = 0
+        if isinstance(self.current_puzzle, dict):
+            points = self.current_puzzle.get('points', 100)
+        else:
+            points = getattr(self.current_puzzle, 'points', 100)
+        
         # Update UI
         self.progress_bar.setValue(100)
         self.result_frame.setVisible(True)
-        self.result_label.setText("CORRECT! Puzzle solved successfully.")
+        self.result_label.setText(f"CORRECT! Puzzle solved successfully.\nYou earned {points} points!")
         self.result_label.setProperty("correct", "true")
         self.result_label.setStyleSheet("")  # Force style refresh
         
@@ -475,11 +495,14 @@ class PuzzleScreen(QWidget):
         # Play success animation
         AccessAnimation.access_granted(self.result_frame)
         
-        # Emit puzzle completed signal
-        self.puzzle_completed.emit(
-            self.current_puzzle.get('id', 0),
-            self.elapsed_seconds
-        )
+        # Emit puzzle completed signal with puzzle ID and time
+        puzzle_id = 0
+        if isinstance(self.current_puzzle, dict):
+            puzzle_id = self.current_puzzle.get('id', 0)
+        else:
+            puzzle_id = getattr(self.current_puzzle, 'id', 0)
+            
+        self.puzzle_completed.emit(puzzle_id, self.elapsed_seconds)
     
     def _handle_incorrect_solution(self):
         """Handle incorrect solution submission"""

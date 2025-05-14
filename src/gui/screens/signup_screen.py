@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                             QSpacerItem, QSizePolicy, QMessageBox)
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap, QFont
+import os
 
 from ..utils.animation_effects import FlickerEffect, CyberDoorTransition
 
@@ -273,6 +274,16 @@ class SignupScreen(QWidget):
             self.username_input.setFocus()
             return
         
+        # Check if username already exists (check if user data file exists)
+        # Ensure data directory exists
+        os.makedirs("data/users", exist_ok=True)
+        
+        user_data_path = f"data/users/{username}.json"
+        if os.path.exists(user_data_path):
+            QMessageBox.warning(self, "Signup Error", f"Username '{username}' is already taken. Please choose another username.")
+            self.username_input.setFocus()
+            return
+        
         if not email:
             QMessageBox.warning(self, "Signup Error", "Please enter an email address")
             self.email_input.setFocus()
@@ -309,6 +320,9 @@ class SignupScreen(QWidget):
             QMessageBox.warning(self, "Signup Error", "Passwords do not match")
             self.confirm_input.setFocus()
             return
+        
+        # Clear inputs before emitting success signal
+        self.clear_inputs()
         
         # In a real application, create a new user in the database
         # For this example, we'll just emit the signup successful signal

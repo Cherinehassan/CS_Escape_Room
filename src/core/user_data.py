@@ -25,7 +25,18 @@ class UserData:
         self.username = username
         self.data_dir = "data/users"
         
-        # Default values
+        # Clear all data first to ensure we start fresh
+        self._reset_data()
+        
+        # Create data directory if it doesn't exist
+        os.makedirs(self.data_dir, exist_ok=True)
+        
+        # Load existing data if username is provided
+        if username:
+            self.load()
+    
+    def _reset_data(self):
+        """Reset all user data to default values"""
         self.completed_puzzles = set()  # Set of completed puzzle IDs
         self.viewed_puzzles = set()     # Set of viewed puzzle IDs
         self.puzzle_completion_times = {}  # Puzzle ID to completion time (seconds)
@@ -34,13 +45,6 @@ class UserData:
         self.time_played = 0            # Total time played in seconds
         self.last_login = datetime.now().isoformat()
         self.session_start_time = time.time()
-        
-        # Create data directory if it doesn't exist
-        os.makedirs(self.data_dir, exist_ok=True)
-        
-        # Load existing data if username is provided
-        if username:
-            self.load()
     
     def mark_puzzle_completed(self, puzzle_id, completion_time=None):
         """
@@ -198,12 +202,13 @@ class UserData:
         self.update_time_played()
         
         # Prepare data for serialization
+        # Convert sets to lists and ensure dictionary keys are strings for JSON
         data = {
             "username": self.username,
             "completed_puzzles": list(self.completed_puzzles),
             "viewed_puzzles": list(self.viewed_puzzles),
-            "puzzle_completion_times": self.puzzle_completion_times,
-            "puzzle_attempts": self.puzzle_attempts,
+            "puzzle_completion_times": {str(k): v for k, v in self.puzzle_completion_times.items()},
+            "puzzle_attempts": {str(k): v for k, v in self.puzzle_attempts.items()},
             "achievements": list(self.achievements),
             "time_played": self.time_played,
             "last_login": datetime.now().isoformat()
@@ -214,6 +219,7 @@ class UserData:
         try:
             with open(filename, 'w') as file:
                 json.dump(data, file, indent=2)
+            print(f"Saved data for user {self.username}: {len(self.completed_puzzles)} completed puzzles")
             return True
         except Exception as e:
             print(f"Error saving user data: {e}")
@@ -224,9 +230,13 @@ class UserData:
         if not self.username:
             return False
         
+        # Reset data before loading to ensure we don't keep any old data
+        self._reset_data()
+        
         filename = os.path.join(self.data_dir, f"{self.username}.json")
         
         if not os.path.exists(filename):
+            print(f"No saved data found for user {self.username}, creating new profile")
             return False
         
         try:
@@ -237,14 +247,31 @@ class UserData:
                 self.completed_puzzles = set(data.get("completed_puzzles", []))
                 self.viewed_puzzles = set(data.get("viewed_puzzles", []))
                 self.puzzle_completion_times = data.get("puzzle_completion_times", {})
+                
+                # Convert puzzle completion time keys to integers
+                # (JSON serializes dictionary keys as strings)
+                if self.puzzle_completion_times:
+                    self.puzzle_completion_times = {
+                        int(k): v for k, v in self.puzzle_completion_times.items()
+                    }
+                
                 self.puzzle_attempts = data.get("puzzle_attempts", {})
+                # Convert puzzle attempt keys to integers
+                if self.puzzle_attempts:
+                    self.puzzle_attempts = {
+                        int(k): v for k, v in self.puzzle_attempts.items()
+                    }
+                
                 self.achievements = set(data.get("achievements", []))
                 self.time_played = data.get("time_played", 0)
                 self.last_login = data.get("last_login", datetime.now().isoformat())
                 
+                print(f"Loaded data for user {self.username}: {len(self.completed_puzzles)} completed puzzles")
                 return True
         except Exception as e:
             print(f"Error loading user data: {e}")
+            # Reset data if there was an error
+            self._reset_data()
             return False
 
 

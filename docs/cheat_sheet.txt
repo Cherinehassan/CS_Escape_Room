@@ -1,0 +1,78 @@
+===================================================
+CYBERSECURITY ESCAPE ROOM - PUZZLE ANSWERS CHEAT SHEET
+===================================================
+
+This document contains answers to all puzzles in the Cybersecurity Escape Room.
+For educational purposes only.
+
+---------------------------------------------------
+EASY PUZZLES
+---------------------------------------------------
+
+Puzzle #1: Password Strength Analysis
+Answer: 3 (LongButSimplePasswordPhrase)
+Explanation: Modern security standards prioritize length over complexity.
+
+Puzzle #2: Caesar Cipher Decryption
+Answer: "Caesar cipher is basic"
+Explanation: Shift each letter backwards by 3 positions in the alphabet.
+
+---------------------------------------------------
+MEDIUM PUZZLES
+---------------------------------------------------
+
+Puzzle #3: Phishing Detection
+Answer: "fake domain"
+Explanation: The email uses "amaz0n-security.net" instead of amazon.com.
+
+Puzzle #4: SQL Injection Analysis
+Answer: "bypass password check"
+Explanation: The SQL comment (--) makes the system ignore the password check.
+
+Puzzle #5: Hash Verification Challenge
+Answer: 2
+Explanation: File 2's hash differs from the original hash.
+
+Puzzle #9: Multi-Factor Authentication
+Answer: 3 (Password + Hardware token)
+Explanation: Hardware tokens are more secure than SMS or email-based methods.
+
+Puzzle #11: Wireless Security Protocol
+Answer: 4 (WPA3)
+Explanation: WPA3 is the newest and most secure WiFi protocol.
+
+Puzzle #13: Public Key Cryptography
+Answer: 2 (The sender's public key)
+Explanation: Digital signatures are verified using the sender's public key.
+
+Puzzle #15: Secure Password Storage
+Answer: 3 (Bcrypt with salt)
+Explanation: Bcrypt with salt provides protection against brute force and rainbow table attacks.
+
+---------------------------------------------------
+HARD PUZZLES
+---------------------------------------------------
+
+Puzzle #6: Network Traffic Analysis
+Answer: "DNS tunneling"
+Explanation: Data is being exfiltrated through DNS requests to a malicious domain.
+
+Puzzle #7: XSS Vulnerability Assessment
+Answer: "<script>alert(1)</script>"
+Explanation: This script tag will execute and create an alert if XSS is possible.
+
+Puzzle #8: Secure Coding Challenge
+Answer: "command injection"
+Explanation: The code concatenates user input directly into a system command.
+
+Puzzle #10: Encryption Key Management
+Answer: 3 (Hardware Security Module)
+Explanation: HSMs provide the strongest physical and logical security for keys.
+
+Puzzle #12: OWASP Top 10 Analysis
+Answer: "Security Misconfiguration"
+Explanation: The server is misconfigured to allow execution of uploaded PHP files.
+
+Puzzle #14: Incident Response
+Answer: "EBCDAF"
+Explanation: Proper order is Preparation, Identification, Containment, Eradication, Recovery, Lessons Learned. 

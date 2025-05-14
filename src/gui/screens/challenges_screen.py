@@ -21,7 +21,7 @@ class ChallengeCard(QFrame):
     # Signal emitted when card is selected
     selected = pyqtSignal(int)  # Emits puzzle ID
     
-    def __init__(self, puzzle_id, title, difficulty, category, description, parent=None):
+    def __init__(self, puzzle_id, title, difficulty, category, description, parent=None, completed=False):
         """
         Initialize challenge card
         
@@ -32,6 +32,7 @@ class ChallengeCard(QFrame):
             category: Category (e.g., network, crypto)
             description: Brief description
             parent: Parent widget
+            completed: Whether the puzzle has been completed
         """
         super().__init__(parent)
         self.puzzle_id = puzzle_id
@@ -39,6 +40,7 @@ class ChallengeCard(QFrame):
         self.difficulty = difficulty
         self.category = category
         self.description = description
+        self.completed = completed
         
         self._create_ui()
         self._apply_styles()
@@ -90,9 +92,17 @@ class ChallengeCard(QFrame):
         main_layout.addLayout(content_layout)
         
         # Start button
-        self.start_button = QPushButton("START CHALLENGE")
+        button_text = "REPLAY CHALLENGE" if self.completed else "START CHALLENGE"
+        self.start_button = QPushButton(button_text)
         self.start_button.setObjectName("challengeButton")
         main_layout.addWidget(self.start_button)
+        
+        # Add completed indicator if completed
+        if self.completed:
+            self.completed_label = QLabel("✓ COMPLETED")
+            self.completed_label.setObjectName("completedLabel")
+            self.completed_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            main_layout.addWidget(self.completed_label)
     
     def _connect_signals(self):
         """Connect signals to slots"""
@@ -108,6 +118,18 @@ class ChallengeCard(QFrame):
         }
         
         difficulty_color = difficulty_colors.get(self.difficulty.lower(), "#00ccff")
+        
+        # Add completed styling
+        completed_style = ""
+        if self.completed:
+            completed_style = """
+                #completedLabel {
+                    color: #4caf50;
+                    font-weight: bold;
+                    font-size: 12px;
+                    margin-top: 5px;
+                }
+            """
         
         self.setStyleSheet(f"""
             #challengeCard_{self.puzzle_id} {{
@@ -156,6 +178,7 @@ class ChallengeCard(QFrame):
                 border: 1px solid #ffffff;
                 color: #ffffff;
             }}
+            {completed_style}
         """)
     
     def highlight(self):
@@ -173,16 +196,18 @@ class ChallengesScreen(QWidget):
     challenge_selected = pyqtSignal(int)  # Emitted when a challenge is selected
     return_to_menu = pyqtSignal()         # Emitted when back button is clicked
     
-    def __init__(self, puzzle_manager, parent=None):
+    def __init__(self, puzzle_manager, user_data=None, parent=None):
         """
         Initialize challenges screen
         
         Args:
             puzzle_manager: Puzzle manager instance
+            user_data: User data instance
             parent: Parent widget
         """
         super().__init__(parent)
         self.puzzle_manager = puzzle_manager
+        self.user_data = user_data
         
         self._create_ui()
         self._connect_signals()
@@ -326,6 +351,11 @@ class ChallengesScreen(QWidget):
         max_cols = 3  # Number of columns in grid
         
         for puzzle in puzzles:
+            # Check if puzzle is completed
+            completed = False
+            if self.user_data and puzzle.id in self.user_data.completed_puzzles:
+                completed = True
+                
             # For backward compatibility, try to handle both dictionary format
             # and Puzzle objects - prefer dictionary fields if puzzle is a dict
             # otherwise use Puzzle object attributes
@@ -336,7 +366,8 @@ class ChallengesScreen(QWidget):
                     puzzle.get('difficulty', 'Medium'),
                     puzzle.get('category', 'General'),
                     puzzle.get('short_description', 'No description available'),
-                    self
+                    self,
+                    completed
                 )
             else:
                 # Find short description if available, or use first part of full description
@@ -351,7 +382,8 @@ class ChallengesScreen(QWidget):
                     puzzle.difficulty,
                     puzzle.category,
                     short_desc,
-                    self
+                    self,
+                    completed
                 )
             
             # Connect card signal

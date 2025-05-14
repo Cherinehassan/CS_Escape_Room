@@ -1,0 +1,22 @@
+{
+  "username": "John",
+  "completed_puzzles": [
+    1,
+    2
+  ],
+  "viewed_puzzles": [
+    1,
+    2
+  ],
+  "puzzle_completion_times": {
+    "1": 5.0,
+    "2": 11.0
+  },
+  "puzzle_attempts": {},
+  "achievements": [
+    "first_steps",
+    "speed_demon"
+  ],
+  "time_played": 55.042237997055054,
+  "last_login": "2025-05-14T09:42:58.348730"
+}

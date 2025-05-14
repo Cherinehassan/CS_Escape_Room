@@ -8,7 +8,7 @@ Shows detailed statistics and analysis of user progress
 
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                            QPushButton, QFrame, QGridLayout, QSpacerItem,
-                           QSizePolicy)
+                           QSizePolicy, QScrollArea)
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap, QFont, QColor
 
@@ -145,28 +145,28 @@ class AnalyticsScreen(QWidget):
         """Create the analytics UI"""
         # Main layout
         main_layout = QVBoxLayout(self)
-        main_layout.setSpacing(20)
-        main_layout.setContentsMargins(40, 40, 40, 40)
+        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(20, 20, 20, 20)
         
         # Header section
         header_layout = QHBoxLayout()
         
         self.title_label = QLabel("PERFORMANCE ANALYTICS")
-        self.title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #00ccff;")
+        self.title_label.setStyleSheet("font-size: 22px; font-weight: bold; color: #00ccff;")
         header_layout.addWidget(self.title_label)
         
         header_layout.addStretch()
         
         self.back_button = QPushButton("← BACK TO DASHBOARD")
-        self.back_button.setFixedSize(200, 40)
+        self.back_button.setFixedSize(180, 30)
         self.back_button.setStyleSheet("""
             QPushButton {
                 background-color: rgba(0, 0, 0, 0.5);
                 color: #cccccc;
                 border: 1px solid #555555;
                 border-radius: 4px;
-                padding: 8px;
-                font-size: 14px;
+                padding: 6px;
+                font-size: 12px;
             }
             
             QPushButton:hover {
@@ -180,8 +180,8 @@ class AnalyticsScreen(QWidget):
         main_layout.addLayout(header_layout)
         
         # Key performance indicators
-        kpi_layout = QHBoxLayout()
-        kpi_layout.setSpacing(20)
+        self.kpi_layout = QHBoxLayout()
+        self.kpi_layout.setSpacing(10)
         
         # Calculate KPIs
         total_puzzles = len(self.puzzle_manager.get_all_puzzles())
@@ -198,220 +198,252 @@ class AnalyticsScreen(QWidget):
         
         # Completion rate indicator
         completion_indicator = PerformanceIndicator(
-            "Completion Rate", 
-            f"{completion_rate}%", 
-            indicator_color="#00ff99" if completion_rate > 75 else "#ffcc00" if completion_rate > 30 else "#ff6666"
+            "Completion Rate", f"{completion_rate}%", indicator_color="#00cc99"
         )
-        kpi_layout.addWidget(completion_indicator)
+        self.kpi_layout.addWidget(completion_indicator)
         
         # Average time indicator
-        time_indicator = PerformanceIndicator(
-            "Avg. Completion Time",
-            avg_completion_time,
-            indicator_color="#00ccff"
+        avg_time_indicator = PerformanceIndicator(
+            "Avg. Completion Time", avg_completion_time, indicator_color="#ff9900"
         )
-        kpi_layout.addWidget(time_indicator)
+        self.kpi_layout.addWidget(avg_time_indicator)
         
-        # Fastest solve indicator
-        fastest_solve = "N/A"
+        # Fastest completion indicator
+        fastest_time = "00:00"
         if self.user_data.puzzle_completion_times:
-            fastest_time = min(self.user_data.puzzle_completion_times.values())
-            minutes = int(fastest_time) // 60
-            seconds = int(fastest_time) % 60
-            fastest_solve = f"{minutes:02d}:{seconds:02d}"
+            fastest = min(self.user_data.puzzle_completion_times.values())
+            minutes = int(fastest) // 60
+            seconds = int(fastest) % 60
+            fastest_time = f"{minutes:02d}:{seconds:02d}"
         
         fastest_indicator = PerformanceIndicator(
-            "Fastest Solve",
-            fastest_solve,
-            indicator_color="#ff9900"
+            "Fastest Solve", fastest_time, indicator_color="#00ccff"
         )
-        kpi_layout.addWidget(fastest_indicator)
+        self.kpi_layout.addWidget(fastest_indicator)
         
-        # Skill rating (0-100 based on completion and speed)
-        skill_rating = 0
-        if completed_puzzles > 0:
-            time_factor = 0
-            if self.user_data.puzzle_completion_times:
-                avg_time = sum(self.user_data.puzzle_completion_times.values()) / len(self.user_data.puzzle_completion_times)
-                # Faster times = higher score (max 50 points)
-                time_factor = max(0, 50 - min(50, int(avg_time / 10)))
+        # Average attempts indicator
+        avg_attempts = 0
+        if self.user_data.puzzle_attempts and self.user_data.completed_puzzles:
+            completed_attempts = sum(self.user_data.puzzle_attempts.get(pid, 1) 
+                                  for pid in self.user_data.completed_puzzles)
+            avg_attempts = completed_attempts / len(self.user_data.completed_puzzles)
             
-            # Completion factor (max 50 points)
-            completion_factor = int((completion_rate / 100) * 50)
-            
-            skill_rating = time_factor + completion_factor
-        
-        skill_indicator = PerformanceIndicator(
-            "Skill Rating",
-            f"{skill_rating}/100",
-            indicator_color="#cc33ff"
+        attempts_indicator = PerformanceIndicator(
+            "Avg. Attempts", f"{avg_attempts:.1f}", indicator_color="#cc00ff"
         )
-        kpi_layout.addWidget(skill_indicator)
+        self.kpi_layout.addWidget(attempts_indicator)
         
-        main_layout.addLayout(kpi_layout)
+        main_layout.addLayout(self.kpi_layout)
         
-        # Category performance section
+        # Category analytics section
         category_frame = QFrame()
+        category_frame.setFrameShape(QFrame.Shape.StyledPanel)
         category_frame.setStyleSheet("background-color: rgba(0, 0, 0, 0.2); border-radius: 5px;")
-        category_layout = QVBoxLayout(category_frame)
         
-        category_title = QLabel("CATEGORY PERFORMANCE")
-        category_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #ffffff;")
+        category_layout = QVBoxLayout(category_frame)
+        category_layout.setContentsMargins(10, 10, 10, 10)
+        
+        category_title = QLabel("CATEGORY ANALYTICS")
+        category_title.setStyleSheet("font-size: 14px; font-weight: bold; color: #ffffff;")
         category_layout.addWidget(category_title)
         
-        # Grid for category analytics
-        category_grid = QGridLayout()
-        category_grid.setSpacing(15)
+        # Create scroll area for categories
+        categories_scroll = QScrollArea()
+        categories_scroll.setWidgetResizable(True)
+        categories_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        categories_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
-        # Get categories
-        categories = set(puzzle.category for puzzle in self.puzzle_manager.get_all_puzzles())
+        # Create container for category analytics
+        self.categories_container = QWidget()
+        self.categories_layout = QVBoxLayout(self.categories_container)
+        self.categories_layout.setSpacing(8)
+        self.categories_layout.setContentsMargins(0, 0, 0, 0)
         
-        # Sample color palette for categories
-        colors = [
-            "#00ccff",  # Cyan
-            "#00ff99",  # Green
-            "#ff9900",  # Orange
-            "#ff3366",  # Red
-            "#cc33ff",  # Purple
-            "#ffcc00"   # Yellow
-        ]
+        # Get category data
+        categories = {}
+        difficulty_ratings = {
+            "Easy": 3,
+            "Medium": 6,
+            "Hard": 9
+        }
         
-        # Add category analytics widget for each category
-        for i, category in enumerate(categories):
-            category_puzzles = self.puzzle_manager.get_puzzles_by_category(category)
-            total_in_category = len(category_puzzles)
+        for puzzle in self.puzzle_manager.get_all_puzzles():
+            category = puzzle.category
+            if category not in categories:
+                categories[category] = {
+                    "total": 0,
+                    "completed": 0,
+                    "times": [],
+                    "difficulty_sum": 0
+                }
             
-            # Skip if no puzzles in category
-            if total_in_category == 0:
-                continue
-                
-            completed_in_category = sum(1 for puzzle in category_puzzles 
-                                     if puzzle.id in self.user_data.completed_puzzles)
+            categories[category]["total"] += 1
+            categories[category]["difficulty_sum"] += difficulty_ratings.get(puzzle.difficulty, 5)
             
-            completion_pct = int((completed_in_category / total_in_category) * 100)
-            
-            # Calculate average time for this category
-            category_times = [self.user_data.puzzle_completion_times.get(puzzle.id, 0) 
-                            for puzzle in category_puzzles 
-                            if puzzle.id in self.user_data.puzzle_completion_times]
+            if puzzle.id in self.user_data.completed_puzzles:
+                categories[category]["completed"] += 1
+                if puzzle.id in self.user_data.puzzle_completion_times:
+                    categories[category]["times"].append(self.user_data.puzzle_completion_times[puzzle.id])
+        
+        # Category colors
+        category_colors = {
+            "Cryptography": "#00ccff",
+            "Authentication": "#ff9900",
+            "Web Security": "#cc00ff",
+            "Network Security": "#00ff99",
+            "Social Engineering": "#ff6666",
+            "Malware": "#ff3333",
+            "Hashing": "#33ccff",
+            "Encryption": "#66ff66",
+            "Security Management": "#ffcc00",
+            "Secure Coding": "#ff99cc"
+        }
+        
+        # Default color for any other categories
+        default_color = "#aaaaaa"
+        
+        # Sort categories by completion rate (highest first)
+        sorted_categories = sorted(
+            categories.items(),
+            key=lambda x: (x[1]["completed"] / x[1]["total"]) if x[1]["total"] > 0 else 0,
+            reverse=True
+        )
+        
+        # Add category analytics widgets
+        for category_name, data in sorted_categories:
+            # Calculate metrics
+            completion_rate = int((data["completed"] / data["total"]) * 100) if data["total"] > 0 else 0
             
             avg_time = "N/A"
-            if category_times:
-                time_avg = sum(category_times) / len(category_times)
-                minutes = int(time_avg) // 60
-                seconds = int(time_avg) % 60
+            if data["times"]:
+                time_in_seconds = sum(data["times"]) / len(data["times"])
+                minutes = int(time_in_seconds) // 60
+                seconds = int(time_in_seconds) % 60
                 avg_time = f"{minutes:02d}:{seconds:02d}"
             
-            # Estimate difficulty based on average completion time and category
-            # This is a placeholder - in a real app, difficulty would be determined by more factors
-            difficulty_rating = 5  # Default middle difficulty
-            if category_times:
-                time_avg = sum(category_times) / len(category_times)
-                # Higher times suggest higher difficulty
-                difficulty_rating = min(10, max(1, int(time_avg / 60) + 3))
+            difficulty_rating = round(data["difficulty_sum"] / data["total"]) if data["total"] > 0 else 0
             
-            color = colors[i % len(colors)]
+            # Create widget
+            color = category_colors.get(category_name, default_color)
             category_widget = CategoryAnalytics(
-                category, completion_pct, avg_time, difficulty_rating, color
+                category_name, completion_rate, avg_time, difficulty_rating, color
             )
-            
-            # Position in grid (3 columns)
-            row = i // 3
-            col = i % 3
-            category_grid.addWidget(category_widget, row, col)
+            self.categories_layout.addWidget(category_widget)
         
-        category_layout.addLayout(category_grid)
+        categories_scroll.setWidget(self.categories_container)
+        category_layout.addWidget(categories_scroll)
         main_layout.addWidget(category_frame)
         
-        # Challenge success rates section
-        success_frame = QFrame()
-        success_frame.setStyleSheet("background-color: rgba(0, 0, 0, 0.2); border-radius: 5px;")
-        success_layout = QVBoxLayout(success_frame)
+        # Performance charts section
+        charts_layout = QHBoxLayout()
+        charts_layout.setSpacing(10)
         
-        success_title = QLabel("CHALLENGE INSIGHTS")
-        success_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #ffffff;")
-        success_layout.addWidget(success_title)
+        # Performance over time chart
+        performance_frame = QFrame()
+        performance_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        performance_frame.setStyleSheet("background-color: rgba(0, 0, 0, 0.2); border-radius: 5px;")
         
-        # Details about completion rates, struggle areas, etc.
-        insights_text = "Insights:"
+        performance_layout = QVBoxLayout(performance_frame)
+        performance_layout.setContentsMargins(10, 10, 10, 10)
         
-        # Find most challenging puzzle (longest completion time)
-        challenging_puzzle_name = "N/A"
-        if self.user_data.puzzle_completion_times:
-            challenging_puzzle_id = max(self.user_data.puzzle_completion_times, 
-                                    key=self.user_data.puzzle_completion_times.get)
-            challenging_puzzle = self.puzzle_manager.get_puzzle_by_id(challenging_puzzle_id)
-            if challenging_puzzle:
-                challenging_puzzle_name = challenging_puzzle.name
-                challenging_time = self.user_data.puzzle_completion_times[challenging_puzzle_id]
-                minutes = int(challenging_time) // 60
-                seconds = int(challenging_time) % 60
-                insights_text += f"\n• Most challenging puzzle: {challenging_puzzle_name} ({minutes:02d}:{seconds:02d})"
+        self.performance_chart_label = QLabel("PERFORMANCE OVER TIME")
+        self.performance_chart_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #ffffff;")
+        performance_layout.addWidget(self.performance_chart_label)
         
-        # Find strongest category (highest completion percentage)
-        strongest_category = "N/A"
-        strongest_pct = 0
+        # Create container for performance chart
+        self.performance_chart_container = QWidget()
+        self.performance_chart_layout = QVBoxLayout(self.performance_chart_container)
+        self.performance_chart_layout.setContentsMargins(0, 0, 0, 0)
         
-        for category in categories:
-            category_puzzles = self.puzzle_manager.get_puzzles_by_category(category)
-            total_in_category = len(category_puzzles)
+        # Add placeholder chart
+        chart_placeholder = QLabel("Chart placeholder - would show completion times over time")
+        chart_placeholder.setStyleSheet("""
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #555555;
+            border-radius: 5px;
+            padding: 20px;
+            color: #aaaaaa;
+            font-size: 12px;
+        """)
+        chart_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.performance_chart_layout.addWidget(chart_placeholder)
+        
+        performance_layout.addWidget(self.performance_chart_container)
+        charts_layout.addWidget(performance_frame)
+        
+        # Difficulty distribution chart
+        difficulty_frame = QFrame()
+        difficulty_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        difficulty_frame.setStyleSheet("background-color: rgba(0, 0, 0, 0.2); border-radius: 5px;")
+        
+        difficulty_layout = QVBoxLayout(difficulty_frame)
+        difficulty_layout.setContentsMargins(10, 10, 10, 10)
+        
+        self.difficulty_chart_label = QLabel("PUZZLE DIFFICULTY DISTRIBUTION")
+        self.difficulty_chart_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #ffffff;")
+        difficulty_layout.addWidget(self.difficulty_chart_label)
+        
+        # Create container for difficulty chart
+        self.difficulty_chart_container = QWidget()
+        self.difficulty_chart_layout = QVBoxLayout(self.difficulty_chart_container)
+        self.difficulty_chart_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Count puzzles by difficulty
+        difficulty_counts = {"Easy": 0, "Medium": 0, "Hard": 0}
+        for puzzle in self.puzzle_manager.get_all_puzzles():
+            if puzzle.difficulty in difficulty_counts:
+                difficulty_counts[puzzle.difficulty] += 1
+        
+        # Create difficulty distribution display
+        difficulty_display_layout = QHBoxLayout()
+        
+        for difficulty, count in difficulty_counts.items():
+            if difficulty == "Easy":
+                color = "#00cc00"
+            elif difficulty == "Medium":
+                color = "#ff9900"
+            else:  # Hard
+                color = "#ff3333"
             
-            if total_in_category == 0:
-                continue
-                
-            completed_in_category = sum(1 for puzzle in category_puzzles 
-                                     if puzzle.id in self.user_data.completed_puzzles)
+            difficulty_widget = QFrame()
+            difficulty_widget.setStyleSheet(f"""
+                background-color: rgba(0, 0, 0, 0.3);
+                border: 1px solid {color};
+                border-radius: 5px;
+                padding: 8px;
+            """)
             
-            completion_pct = int((completed_in_category / total_in_category) * 100)
+            diff_layout = QVBoxLayout(difficulty_widget)
             
-            if completion_pct > strongest_pct:
-                strongest_pct = completion_pct
-                strongest_category = category
-        
-        if strongest_category != "N/A":
-            insights_text += f"\n• Strongest category: {strongest_category} ({strongest_pct}% complete)"
-        
-        # Find areas for improvement (lowest completion rate)
-        weakest_category = "N/A"
-        weakest_pct = 100
-        
-        for category in categories:
-            category_puzzles = self.puzzle_manager.get_puzzles_by_category(category)
-            total_in_category = len(category_puzzles)
+            diff_title = QLabel(difficulty)
+            diff_title.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 14px;")
+            diff_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            diff_layout.addWidget(diff_title)
             
-            if total_in_category == 0:
-                continue
-                
-            completed_in_category = sum(1 for puzzle in category_puzzles 
-                                     if puzzle.id in self.user_data.completed_puzzles)
+            diff_count = QLabel(f"{count} puzzles")
+            diff_count.setStyleSheet("color: #ffffff; font-size: 12px;")
+            diff_count.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            diff_layout.addWidget(diff_count)
             
-            completion_pct = int((completed_in_category / total_in_category) * 100)
+            # Calculate completion percentage for this difficulty
+            completed_count = sum(1 for pid in self.user_data.completed_puzzles 
+                               if self.puzzle_manager.get_puzzle_by_id(pid) and 
+                               self.puzzle_manager.get_puzzle_by_id(pid).difficulty == difficulty)
             
-            if completed_in_category < total_in_category and completion_pct < weakest_pct:
-                weakest_pct = completion_pct
-                weakest_category = category
+            completion_pct = int((completed_count / count) * 100) if count > 0 else 0
+            
+            diff_completion = QLabel(f"{completion_pct}% completed")
+            diff_completion.setStyleSheet(f"color: {color}; font-size: 12px;")
+            diff_completion.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            diff_layout.addWidget(diff_completion)
+            
+            difficulty_display_layout.addWidget(difficulty_widget)
         
-        if weakest_category != "N/A":
-            insights_text += f"\n• Area for improvement: {weakest_category} ({weakest_pct}% complete)"
+        self.difficulty_chart_layout.addLayout(difficulty_display_layout)
+        difficulty_layout.addWidget(self.difficulty_chart_container)
+        charts_layout.addWidget(difficulty_frame)
         
-        # Overall progress assessment
-        if completion_rate < 25:
-            insights_text += "\n• You're just getting started! Try completing more challenges to build your skills."
-        elif completion_rate < 50:
-            insights_text += "\n• Good progress! You're developing your cybersecurity knowledge."
-        elif completion_rate < 75:
-            insights_text += "\n• Great work! You've mastered many of the challenges."
-        elif completion_rate < 100:
-            insights_text += "\n• Excellent! You're close to becoming a cybersecurity master."
-        else:
-            insights_text += "\n• Perfect! You've completed all challenges. Try to beat your best times!"
-        
-        insights_label = QLabel(insights_text)
-        insights_label.setStyleSheet("color: #cccccc; font-size: 14px; line-height: 1.5;")
-        insights_label.setWordWrap(True)
-        success_layout.addWidget(insights_label)
-        
-        main_layout.addWidget(success_frame)
+        main_layout.addLayout(charts_layout)
     
     def _connect_signals(self):
         """Connect signals to slots"""
@@ -436,22 +468,236 @@ class AnalyticsScreen(QWidget):
     
     def _refresh_data(self):
         """Refresh analytics data"""
-        # This would update all widgets with fresh data
-        # For now, we'll just recreate the UI since that handles everything
+        # Clear existing UI
         self._clear_ui()
-        self._create_ui()
-        self._connect_signals()
-        self._apply_animations()
+        
+        # Get user statistics
+        stats = self.user_data.get_statistics()
+        
+        # Update KPIs
+        total_puzzles = len(self.puzzle_manager.get_all_puzzles())
+        completed_puzzles = len(self.user_data.completed_puzzles)
+        completion_rate = int((completed_puzzles / total_puzzles) * 100) if total_puzzles > 0 else 0
+        
+        # Format time values
+        avg_completion_time = "00:00"
+        if self.user_data.puzzle_completion_times:
+            avg_time = sum(self.user_data.puzzle_completion_times.values()) / len(self.user_data.puzzle_completion_times)
+            minutes = int(avg_time) // 60
+            seconds = int(avg_time) % 60
+            avg_completion_time = f"{minutes:02d}:{seconds:02d}"
+        
+        fastest_time = "00:00"
+        if self.user_data.puzzle_completion_times:
+            fastest = min(self.user_data.puzzle_completion_times.values())
+            minutes = int(fastest) // 60
+            seconds = int(fastest) % 60
+            fastest_time = f"{minutes:02d}:{seconds:02d}"
+        
+        # Create KPI indicators
+        completion_indicator = PerformanceIndicator(
+            "Completion Rate", f"{completion_rate}%", indicator_color="#00cc99"
+        )
+        self.kpi_layout.addWidget(completion_indicator)
+        
+        avg_time_indicator = PerformanceIndicator(
+            "Avg. Completion Time", avg_completion_time, indicator_color="#ff9900"
+        )
+        self.kpi_layout.addWidget(avg_time_indicator)
+        
+        fastest_indicator = PerformanceIndicator(
+            "Fastest Solve", fastest_time, indicator_color="#00ccff"
+        )
+        self.kpi_layout.addWidget(fastest_indicator)
+        
+        attempts_indicator = PerformanceIndicator(
+            "Avg. Attempts", f"{stats['avg_attempts']:.1f}", indicator_color="#cc00ff"
+        )
+        self.kpi_layout.addWidget(attempts_indicator)
+        
+        # Create category analytics
+        categories = {}
+        difficulty_ratings = {
+            "Easy": 3,
+            "Medium": 6,
+            "Hard": 9
+        }
+        
+        # Collect data by category
+        for puzzle in self.puzzle_manager.get_all_puzzles():
+            category = puzzle.category
+            if category not in categories:
+                categories[category] = {
+                    "total": 0,
+                    "completed": 0,
+                    "times": [],
+                    "difficulty_sum": 0
+                }
+            
+            categories[category]["total"] += 1
+            categories[category]["difficulty_sum"] += difficulty_ratings.get(puzzle.difficulty, 5)
+            
+            if puzzle.id in self.user_data.completed_puzzles:
+                categories[category]["completed"] += 1
+                if puzzle.id in self.user_data.puzzle_completion_times:
+                    categories[category]["times"].append(self.user_data.puzzle_completion_times[puzzle.id])
+        
+        # Create category analytics widgets
+        category_colors = {
+            "Cryptography": "#00ccff",
+            "Authentication": "#ff9900",
+            "Web Security": "#cc00ff",
+            "Network Security": "#00ff99",
+            "Social Engineering": "#ff6666",
+            "Malware": "#ff3333",
+            "Hashing": "#33ccff",
+            "Encryption": "#66ff66",
+            "Security Management": "#ffcc00",
+            "Secure Coding": "#ff99cc"
+        }
+        
+        # Default color for any other categories
+        default_color = "#aaaaaa"
+        
+        # Sort categories by completion rate (highest first)
+        sorted_categories = sorted(
+            categories.items(),
+            key=lambda x: (x[1]["completed"] / x[1]["total"]) if x[1]["total"] > 0 else 0,
+            reverse=True
+        )
+        
+        # Add category analytics widgets
+        for category_name, data in sorted_categories:
+            # Calculate metrics
+            completion_rate = int((data["completed"] / data["total"]) * 100) if data["total"] > 0 else 0
+            
+            avg_time = "N/A"
+            if data["times"]:
+                time_in_seconds = sum(data["times"]) / len(data["times"])
+                minutes = int(time_in_seconds) // 60
+                seconds = int(time_in_seconds) % 60
+                avg_time = f"{minutes:02d}:{seconds:02d}"
+            
+            difficulty_rating = round(data["difficulty_sum"] / data["total"]) if data["total"] > 0 else 0
+            
+            # Create widget
+            color = category_colors.get(category_name, default_color)
+            category_widget = CategoryAnalytics(
+                category_name, completion_rate, avg_time, difficulty_rating, color
+            )
+            self.categories_layout.addWidget(category_widget)
+        
+        # Create performance over time chart (placeholder)
+        self.performance_chart_label.setText("Performance Over Time")
+        
+        # Add sample chart data (this would be replaced with actual chart in a real implementation)
+        chart_placeholder = QLabel("Chart placeholder - would show completion times over time")
+        chart_placeholder.setStyleSheet("""
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #555555;
+            border-radius: 5px;
+            padding: 40px;
+            color: #aaaaaa;
+        """)
+        chart_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.performance_chart_layout.addWidget(chart_placeholder)
+        
+        # Create difficulty distribution chart (placeholder)
+        self.difficulty_chart_label.setText("Puzzle Difficulty Distribution")
+        
+        # Count puzzles by difficulty
+        difficulty_counts = {"Easy": 0, "Medium": 0, "Hard": 0}
+        for puzzle in self.puzzle_manager.get_all_puzzles():
+            if puzzle.difficulty in difficulty_counts:
+                difficulty_counts[puzzle.difficulty] += 1
+        
+        # Create difficulty distribution display
+        difficulty_layout = QHBoxLayout()
+        
+        for difficulty, count in difficulty_counts.items():
+            if difficulty == "Easy":
+                color = "#00cc00"
+            elif difficulty == "Medium":
+                color = "#ff9900"
+            else:  # Hard
+                color = "#ff3333"
+            
+            difficulty_widget = QFrame()
+            difficulty_widget.setStyleSheet(f"""
+                background-color: rgba(0, 0, 0, 0.3);
+                border: 1px solid {color};
+                border-radius: 5px;
+                padding: 10px;
+            """)
+            
+            diff_layout = QVBoxLayout(difficulty_widget)
+            
+            diff_title = QLabel(difficulty)
+            diff_title.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 16px;")
+            diff_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            diff_layout.addWidget(diff_title)
+            
+            diff_count = QLabel(f"{count} puzzles")
+            diff_count.setStyleSheet("color: #ffffff; font-size: 14px;")
+            diff_count.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            diff_layout.addWidget(diff_count)
+            
+            # Calculate completion percentage for this difficulty
+            completed_count = sum(1 for pid in self.user_data.completed_puzzles 
+                               if self.puzzle_manager.get_puzzle_by_id(pid) and 
+                               self.puzzle_manager.get_puzzle_by_id(pid).difficulty == difficulty)
+            
+            completion_pct = int((completed_count / count) * 100) if count > 0 else 0
+            
+            diff_completion = QLabel(f"{completion_pct}% completed")
+            diff_completion.setStyleSheet(f"color: {color}; font-size: 14px;")
+            diff_completion.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            diff_layout.addWidget(diff_completion)
+            
+            difficulty_layout.addWidget(difficulty_widget)
+        
+        self.difficulty_chart_layout.addLayout(difficulty_layout)
     
     def _clear_ui(self):
-        """Clear existing UI elements"""
-        # Remove all widgets from layout
-        if self.layout():
-            while self.layout().count():
-                item = self.layout().takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.deleteLater()
-            
-            # Delete layout
-            QWidget().setLayout(self.layout()) 
+        """Clear UI elements before refreshing"""
+        # Clear KPI layout
+        for i in reversed(range(self.kpi_layout.count())):
+            item = self.kpi_layout.itemAt(i)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        # Clear categories layout
+        for i in reversed(range(self.categories_layout.count())):
+            item = self.categories_layout.itemAt(i)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        # Clear performance chart layout
+        for i in reversed(range(self.performance_chart_layout.count())):
+            item = self.performance_chart_layout.itemAt(i)
+            if item.widget():
+                item.widget().deleteLater()
+            elif item.layout():
+                # Remove all widgets from the nested layout
+                nested_layout = item.layout()
+                for j in reversed(range(nested_layout.count())):
+                    nested_item = nested_layout.itemAt(j)
+                    if nested_item.widget():
+                        nested_item.widget().deleteLater()
+                # Remove the layout itself
+                self.performance_chart_layout.removeItem(item)
+        
+        # Clear difficulty chart layout
+        for i in reversed(range(self.difficulty_chart_layout.count())):
+            item = self.difficulty_chart_layout.itemAt(i)
+            if item.widget():
+                item.widget().deleteLater()
+            elif item.layout():
+                # Remove all widgets from the nested layout
+                nested_layout = item.layout()
+                for j in reversed(range(nested_layout.count())):
+                    nested_item = nested_layout.itemAt(j)
+                    if nested_item.widget():
+                        nested_item.widget().deleteLater()
+                # Remove the layout itself
+                self.difficulty_chart_layout.removeItem(item) 

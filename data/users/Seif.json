@@ -1,0 +1,19 @@
+{
+  "username": "Seif",
+  "completed_puzzles": [
+    1
+  ],
+  "viewed_puzzles": [
+    1
+  ],
+  "puzzle_completion_times": {
+    "1": 3.0
+  },
+  "puzzle_attempts": {},
+  "achievements": [
+    "speed_demon",
+    "first_steps"
+  ],
+  "time_played": 39.148677825927734,
+  "last_login": "2025-05-14T09:46:45.442139"
+}

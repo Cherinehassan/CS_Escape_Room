@@ -6,12 +6,14 @@ Application integration example for Cybersecurity Escape Room
 Shows how to incorporate all components into the main application
 """
 
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt6.QtCore import Qt, QTimer
+import os
 
 # Import core components
 from src.core.puzzle_manager import PuzzleManager
-from src.core.user_data import UserData
+from src.core.user_data import UserData, AchievementManager
+from src.core.ranking_system import RankingSystem
 
 # Import utility components
 from src.gui.utils.animation_effects import FlickerEffect, CyberDoorTransition
@@ -27,6 +29,7 @@ from src.gui.screens.challenges_screen import ChallengesScreen
 from src.gui.screens.settings_screen import SettingsScreen
 from src.gui.screens.puzzle_screen import PuzzleScreen
 from src.gui.screens.analytics_screen import AnalyticsScreen
+from src.gui.screens.leaderboard_screen import LeaderboardScreen
 from src.gui.tutorial_screen import TutorialScreen
 
 
@@ -51,12 +54,22 @@ class CyberEscapeRoomApp(QMainWindow):
     
     def _init_managers(self):
         """Initialize managers and core components"""
+        # Ensure data directories exist
+        os.makedirs("data", exist_ok=True)
+        os.makedirs("data/users", exist_ok=True)
+        
         # Initialize puzzle manager
         self.puzzle_manager = PuzzleManager()
         self.puzzle_manager.load_puzzles("data/puzzles.json")
         
-        # Initialize user data
+        # Initialize user data - start with empty user data (no username)
         self.user_data = UserData()
+        
+        # Initialize achievement manager
+        self.achievement_manager = AchievementManager()
+        
+        # Initialize ranking system
+        self.ranking_system = RankingSystem()
         
         # Initialize theme manager
         self.theme_manager = ThemeManager()
@@ -88,7 +101,7 @@ class CyberEscapeRoomApp(QMainWindow):
         self.screen_manager.add_screen("dashboard", self.dashboard_screen)
         
         # Create and add challenges screen
-        self.challenges_screen = ChallengesScreen(self.puzzle_manager)
+        self.challenges_screen = ChallengesScreen(self.puzzle_manager, self.user_data)
         self.screen_manager.add_screen("challenges", self.challenges_screen)
         
         # Create and add settings screen
@@ -102,6 +115,10 @@ class CyberEscapeRoomApp(QMainWindow):
         # Create and add analytics screen
         self.analytics_screen = AnalyticsScreen(self.puzzle_manager, self.user_data)
         self.screen_manager.add_screen("analytics", self.analytics_screen)
+        
+        # Create and add leaderboard screen
+        self.leaderboard_screen = LeaderboardScreen(self.ranking_system, None)
+        self.screen_manager.add_screen("leaderboard", self.leaderboard_screen)
         
         # Create and add tutorial screen
         self.tutorial_screen = TutorialScreen(self)
@@ -126,6 +143,7 @@ class CyberEscapeRoomApp(QMainWindow):
         self.main_menu_screen.view_puzzles_requested.connect(self._on_view_puzzles)
         self.main_menu_screen.view_dashboard_requested.connect(self._on_view_dashboard)
         self.main_menu_screen.view_analytics_requested.connect(self._on_view_analytics)
+        self.main_menu_screen.view_leaderboard_requested.connect(self._on_view_leaderboard)
         self.main_menu_screen.view_settings_requested.connect(self._on_view_settings)
         self.main_menu_screen.view_tutorial_requested.connect(self._on_view_tutorial)
         self.main_menu_screen.logout_requested.connect(self._on_logout)
@@ -148,10 +166,32 @@ class CyberEscapeRoomApp(QMainWindow):
         
         # Connect analytics screen signals
         self.analytics_screen.return_to_dashboard.connect(self._on_return_to_dashboard)
+        
+        # Connect leaderboard screen signals
+        self.leaderboard_screen.return_to_menu.connect(self._on_return_to_menu)
     
     def _on_login_successful(self, username):
         """Handle successful login"""
         print(f"Login successful for user: {username}")
+        
+        # Save current user data if there is a username
+        if hasattr(self, 'user_data') and self.user_data.username:
+            self.user_data.save()
+        
+        # Initialize a fresh user data object with the new username
+        self.user_data = UserData(username)
+        
+        # Update screens with the user data
+        self.dashboard_screen.user_data = self.user_data
+        self.challenges_screen.user_data = self.user_data
+        self.analytics_screen.user_data = self.user_data
+        self.leaderboard_screen.set_current_username(username)
+        
+        # Refresh data on screens
+        self.dashboard_screen._refresh_data()
+        self.analytics_screen._refresh_data()
+        self.challenges_screen.load_puzzles()
+        
         print(f"Main menu screen exists: {self.main_menu_screen is not None}")
         self.main_menu_screen.update_username(username)
         print("Going to main menu screen")
@@ -164,7 +204,30 @@ class CyberEscapeRoomApp(QMainWindow):
         
     def _on_signup_successful(self, username):
         """Handle successful signup"""
+        print(f"Signup successful for user: {username}")
+        
+        # Save current user data if there is a username
+        if hasattr(self, 'user_data') and self.user_data.username:
+            self.user_data.save()
+        
+        # Initialize a fresh user data object for the new user
+        self.user_data = UserData(username)
+        
+        # Update screens with the new user data
+        self.dashboard_screen.user_data = self.user_data
+        self.challenges_screen.user_data = self.user_data
+        self.analytics_screen.user_data = self.user_data
+        self.leaderboard_screen.set_current_username(username)
+        
+        # Refresh data on screens (with empty data for new user)
+        self.dashboard_screen._refresh_data()
+        self.analytics_screen._refresh_data()
+        self.challenges_screen.load_puzzles()
+        
+        # Update menu screen username
         self.main_menu_screen.update_username(username)
+        
+        # Navigate to main menu
         self.screen_manager.go_to_screen("main_menu")
         
     def _on_return_to_login(self):
@@ -197,6 +260,10 @@ class CyberEscapeRoomApp(QMainWindow):
         """Handle view analytics request"""
         self.screen_manager.go_to_screen("analytics")
         
+    def _on_view_leaderboard(self):
+        """Handle view leaderboard request"""
+        self.screen_manager.go_to_screen("leaderboard")
+        
     def _on_view_tutorial(self):
         """Handle view tutorial request"""
         self.screen_manager.go_to_screen("tutorial")
@@ -207,6 +274,25 @@ class CyberEscapeRoomApp(QMainWindow):
         
     def _on_logout(self):
         """Handle logout request"""
+        # Save user data before logout
+        if hasattr(self, 'user_data') and self.user_data.username:
+            self.user_data.save()
+            print(f"User data saved for {self.user_data.username}")
+            
+        # Create a brand new UserData object with no username
+        self.user_data = UserData()
+        
+        # Update screens with empty user data
+        self.dashboard_screen.user_data = self.user_data
+        self.challenges_screen.user_data = self.user_data
+        self.analytics_screen.user_data = self.user_data
+        self.leaderboard_screen.set_current_username(None)
+        
+        # Clear login inputs
+        if hasattr(self, 'login_screen'):
+            self.login_screen.clear_inputs()
+        
+        # Navigate to login screen
         self.screen_manager.go_to_screen("login")
         
     def _on_challenge_selected(self, puzzle_id):
@@ -216,26 +302,55 @@ class CyberEscapeRoomApp(QMainWindow):
         Args:
             puzzle_id: ID of the selected puzzle
         """
+        # If puzzle_id is 0, it's the "View All" button, just go to challenges
+        if puzzle_id == 0:
+            self.screen_manager.go_to_screen("challenges")
+            return
+            
+        # Mark the puzzle as viewed
+        self.user_data.mark_puzzle_viewed(puzzle_id)
+        
         # Load the selected puzzle
         self.puzzle_screen.load_puzzle(puzzle_id)
         
+        # Check if puzzle is already completed
+        if puzzle_id in self.user_data.completed_puzzles:
+            print(f"Challenge {puzzle_id} already completed, showing in replay mode")
+        else:
+            print(f"Challenge {puzzle_id} selected for first attempt")
+        
         # Navigate to puzzle screen
         self.screen_manager.go_to_screen("puzzle")
-        print(f"Challenge {puzzle_id} selected")
         
     def _on_puzzle_completed(self, puzzle_id, time):
-        """
-        Handle puzzle completion
+        """Handle puzzle completion"""
+        # Update user data
+        self.user_data.mark_puzzle_completed(puzzle_id, time)
         
-        Args:
-            puzzle_id: ID of the completed puzzle
-            time: Time taken to complete the puzzle in seconds
-        """
-        # Update user data with completed puzzle
-        # self.user_data.add_completed_puzzle(puzzle_id, time)
+        # Check for achievements
+        if hasattr(self, 'achievement_manager'):
+            newly_unlocked = self.achievement_manager.check_achievements(self.user_data, self.puzzle_manager)
+            
+            # Display newly unlocked achievements if any
+            if newly_unlocked:
+                achievement_names = [ach.title for ach in newly_unlocked]
+                message = "Achievements unlocked:\n" + "\n".join(f"• {name}" for name in achievement_names)
+                QMessageBox.information(self, "Achievements Unlocked", message)
         
-        # Return to challenges screen after delay
-        QTimer.singleShot(3000, self._on_return_to_challenges)
+        # Save user data
+        self.user_data.save()
+        
+        # Update dashboard and analytics with the new completion data
+        self.dashboard_screen._refresh_data()
+        self.analytics_screen._refresh_data()
+        self.challenges_screen.load_puzzles()  # Refresh challenges to show completed status
+        
+        # Refresh leaderboard
+        self.leaderboard_screen._refresh_rankings()
+        
+        # Show congratulations message and return to challenges
+        print(f"Puzzle {puzzle_id} completed in {time:.1f} seconds")
+        self.screen_manager.go_to_screen("challenges")
         
     def _on_return_to_challenges(self):
         """Return to challenges screen from puzzle screen"""
@@ -266,7 +381,8 @@ class CyberEscapeRoomApp(QMainWindow):
     def closeEvent(self, event):
         """Handle application close event"""
         # Save user data
-        # self.user_data.save()
+        if self.user_data and self.user_data.username:
+            self.user_data.save()
         
         # Clean up resources
         super().closeEvent(event)

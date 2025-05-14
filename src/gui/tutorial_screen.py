@@ -311,4 +311,8 @@ class TutorialScreen(QWidget):
     
     def goto_menu(self):
         """Return to menu screen"""
-        self.main_window.goto_menu() 
+        try:
+            # Use screen_manager to navigate to main menu
+            self.main_window.screen_manager.go_to_screen("main_menu")
+        except Exception as e:
+            print(f"Error returning to menu: {e}") 
